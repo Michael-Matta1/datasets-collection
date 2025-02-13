@@ -1,3 +1,7 @@
+## 🚨 Important Notice 🚨
+
+⚠️ **This project is no longer functional** because Amazon has changed its website HTML structure.  
+As of now, I am **not considering updating this project**, as it was primarily for practice. However, I might update it in the future.
 ---
 
 # Amazon Web Scraping Project
