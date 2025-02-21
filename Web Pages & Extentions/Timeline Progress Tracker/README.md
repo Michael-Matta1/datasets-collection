@@ -5,7 +5,7 @@
 ---
 ## Main Version
 
->The primary and most up-to-date version of the project is located in the `index.html` file.
+The primary and most up-to-date version of the project is located in the `index.html` file.
 
 ---
 ## Features
