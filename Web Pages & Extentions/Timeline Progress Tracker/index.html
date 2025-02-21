@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Term Timeline Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="Chrome Extention/icon.png">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --accent-color: #FFD700;
+            --bg-gradient: linear-gradient(-45deg, #1a1a1a, #121212, #1a1a1a, #121212);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-hover-bg: rgba(255, 255, 255, 0.1);
+            --text-primary: rgba(255, 255, 255, 0.9);
+            --text-secondary: rgba(255, 255, 255, 0.7);
+        }
+
+        :root[data-theme="light"] {
+            --primary-color: #4CAF50;
+            --accent-color: #FFD700;
+            --bg-gradient: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --card-hover-bg: rgba(255, 255, 255, 1);
+            --text-primary: rgba(0, 0, 0, 0.9);
+            --text-secondary: rgba(0, 0, 0, 0.7);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background: var(--bg-gradient);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 40px 20px;
+            display: grid;
+            gap: 25px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .container.loaded {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .info-block {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .info-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+        }
+
+        .info-block:hover {
+            transform: translateY(-5px) !important;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(76, 175, 80, 0.3); /* Green shadow on hover */
+        }
+
+        .info-block:hover::before {
+            transform: translateX(100%);
+        }
+
+        .label {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        .value {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: var(--primary-color);
+            transition: color 0.3s;
+            margin: 5px 0;
+            text-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+        }
+
+        .passed {
+            color: #ff4444;
+            animation: pulseGlow 2s infinite;
+        }
+
+        .week-type {
+            font-size: 1.2em;
+            color: var(--accent-color);
+            margin-left: 15px;
+            font-weight: 500;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        .sub-value {
+            font-size: 1.1em;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        .timezone-indicator {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            opacity: 0.8;
+        }
+
+        .flex-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary-color);
+            transition: width 0.5s ease-out;
+            position: relative;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            animation: progressShine 2s infinite;
+            opacity: 0.5;
+        }
+
+        .progress-container:hover .progress-bar {
+            background: var(--accent-color);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        @keyframes progressShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes pulseGlow {
+            0% { opacity: 1; text-shadow: 0 0 20px rgba(255, 68, 68, 0.3); }
+            50% { opacity: 0.7; text-shadow: 0 0 30px rgba(255, 68, 68, 0.5); }
+            100% { opacity: 1; text-shadow: 0 0 20px rgba(255, 68, 68, 0.3); }
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            padding: 10px;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                gap: 15px;
+            }
+
+            .value {
+                font-size: 1.8em;
+            }
+
+            .week-type {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button id="theme-toggle" class="theme-toggle">🌓</button>
+    <div class="container" role="main">
+        <div class="info-block" tabindex="0">
+            <div class="label">Today</div>
+            <div id="today" class="value"></div>
+            <div class="timezone-indicator">(Cairo Time)</div>
+        </div>
+
+        <div class="info-block" tabindex="0">
+            <div class="label">Term Week</div>
+            <div class="flex-center">
+                <div id="termWeek" class="value"></div>
+                <div id="weekType" class="week-type"></div>
+            </div>
+            <div class="progress-container">
+                <div id="weekProgress" class="progress-bar"></div>
+            </div>
+        </div>
+
+        <div class="info-block" tabindex="0">
+            <div class="label">Until Midterm (April 5, 2025)</div>
+            <div id="midtermDays" class="value"></div>
+            <div id="midtermWeeks" class="sub-value"></div>
+            <div class="progress-container">
+                <div id="midtermProgress" class="progress-bar"></div>
+            </div>
+        </div>
+
+        <div class="info-block" tabindex="0">
+            <div class="label">Until Final (May 24, 2025)</div>
+            <div id="finalDays" class="value"></div>
+            <div id="finalWeeks" class="sub-value"></div>
+            <div class="progress-container">
+                <div id="finalProgress" class="progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer">
+    <p>To Download the Chrome Extension: <a href="https://github.com/Michael-Matta1/cce-term-timeline-counter#:~:text=and%20dark%20themes.-,Chrome%20Extension,-A%20Chrome%20extension" target="_blank">GitHub Repository</a></p>
+</footer>
+
+
+    <script>
+const TIMEZONE = "Africa/Cairo";
+
+// Get the current time in Cairo time zone using Intl.DateTimeFormat
+function getCairoNow() {
+    const formatter = new Intl.DateTimeFormat("en-US", {
+        timeZone: TIMEZONE,
+        hour12: false,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+    });
+    const parts = formatter.formatToParts(new Date());
+    const { year, month, day, hour, minute, second } = Object.fromEntries(
+        parts.map(({ type, value }) => [type, value])
+    );
+    return new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}`);
+}
+
+// Format countdown with relative time
+function formatCountdown(value, unit) {
+    const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+    return value < 0 
+        ? `<span class='passed'>${rtf.format(value, unit)}</span>` 
+        : rtf.format(value, unit);
+}
+
+// Create a date in Cairo time zone using Intl.DateTimeFormat
+function getCairoDate(year, month, day) {
+    const date = new Date(Date.UTC(year, month - 1, day));
+    const formatter = new Intl.DateTimeFormat("en-US", {
+        timeZone: TIMEZONE,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+    });
+    const parts = formatter.formatToParts(date);
+    const { year: localYear, month: localMonth, day: localDay } = Object.fromEntries(
+        parts.map(({ type, value }) => [type, value])
+    );
+    return new Date(`${localYear}-${localMonth}-${localDay}T00:00:00`);
+}
+
+// Define important dates
+const startDate = getCairoDate(2025, 2, 8);
+const midtermDate = getCairoDate(2025, 4, 5);
+const finalDate = getCairoDate(2025, 5, 24);
+
+// Update progress bar width
+function updateProgress(elementId, current, total) {
+    if (total === 0) return; // Avoid division by zero
+    const progress = Math.max(0, Math.min(100, (current / total) * 100));
+    const progressElement = document.getElementById(elementId);
+    if (progressElement) {
+        progressElement.style.width = `${progress}%`;
+    }
+}
+
+// Update all counts and progress bars
+function updateCounts() {
+    const cairoNow = getCairoNow();
+
+    // Update today's date display
+    const formatter = new Intl.DateTimeFormat("en-US", {
+        weekday: "long", year: "numeric", month: "long", day: "numeric", timeZone: TIMEZONE
+    });
+    const todayElement = document.getElementById("today");
+    if (todayElement) {
+        todayElement.textContent = formatter.format(cairoNow);
+    }
+
+    // Update timezone indicator
+    const timezoneIndicator = document.querySelector(".timezone-indicator");
+    if (timezoneIndicator) {
+        timezoneIndicator.textContent = 
+            `(${Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, timeZoneName: 'short' }).format(cairoNow)})`;
+    }
+
+    // Calculate term week and progress
+    let daysSinceStart = Math.floor((cairoNow - startDate) / (1000 * 60 * 60 * 24));
+    let termWeekText = "Pre-Term";
+    let weekTypeText = "";
+
+    if (daysSinceStart >= 0) {
+        const termWeek = Math.floor(daysSinceStart / 7) + 1;
+        termWeekText = `Week ${Math.max(termWeek, 1)}`;
+        weekTypeText = termWeek % 2 === 0 ? "(Even)" : "(Odd)";
+
+        // Update week progress
+        const daysIntoWeek = daysSinceStart % 7;
+        updateProgress("weekProgress", daysIntoWeek + 1, 7);
+    }
+
+    const termWeekElement = document.getElementById("termWeek");
+    const weekTypeElement = document.getElementById("weekType");
+    if (termWeekElement && weekTypeElement) {
+        termWeekElement.textContent = termWeekText;
+        weekTypeElement.textContent = weekTypeText;
+    }
+
+    // Update countdown and progress bars
+    function updateCountdown(targetDate, daysElementId, weeksElementId, progressId) {
+        const totalDays = Math.ceil((targetDate - startDate) / (1000 * 60 * 60 * 24));
+        const daysRemaining = Math.ceil((targetDate - cairoNow) / (1000 * 60 * 60 * 24));
+        const daysPassed = totalDays - daysRemaining;
+
+        const daysElement = document.getElementById(daysElementId);
+        const weeksElement = document.getElementById(weeksElementId);
+        if (daysElement && weeksElement) {
+            daysElement.innerHTML = formatCountdown(daysRemaining, "day");
+            weeksElement.innerHTML = formatCountdown(Math.ceil(daysRemaining / 7), "week");
+        }
+        updateProgress(progressId, daysPassed, totalDays);
+    }
+
+    updateCountdown(midtermDate, "midtermDays", "midtermWeeks", "midtermProgress");
+    updateCountdown(finalDate, "finalDays", "finalWeeks", "finalProgress");
+}
+
+// Calculate milliseconds until next hour
+function getMsUntilNextHour() {
+    const now = getCairoNow();
+    const nextHour = new Date(now);
+    nextHour.setHours(nextHour.getHours() + 1, 0, 0, 0);
+    return nextHour - now;
+}
+
+// Calculate milliseconds until midnight
+function getMsUntilMidnight() {
+    const now = getCairoNow();
+    const midnight = new Date(now);
+    midnight.setHours(24, 0, 0, 0);
+    return midnight - now;
+}
+
+// Schedule both hourly and midnight updates
+function scheduleUpdates() {
+    // Initial update
+    updateCounts();
+
+    // Schedule first hourly update at the next hour
+    setTimeout(() => {
+        updateCounts();
+        // Then set up recurring hourly updates
+        setInterval(updateCounts, 60 * 60 * 1000); // Every hour
+    }, getMsUntilNextHour());
+
+    // Schedule midnight update for date rollover
+    setTimeout(() => {
+        updateCounts();
+        // Then set up recurring midnight updates
+        setInterval(updateCounts, 24 * 60 * 60 * 1000); // Every 24 hours
+    }, getMsUntilMidnight());
+}
+
+// Theme toggle with localStorage persistence and dark mode default
+const themeToggle = document.getElementById('theme-toggle');
+const root = document.documentElement;
+
+if (themeToggle) {
+    // Set dark as default if no theme is saved
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    root.setAttribute('data-theme', savedTheme);
+    themeToggle.textContent = savedTheme === 'light' ? '🌞' : '🌓';
+
+    themeToggle.addEventListener('click', () => {
+        const newTheme = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        root.setAttribute('data-theme', newTheme);
+        themeToggle.textContent = newTheme === 'light' ? '🌞' : '🌓';
+        localStorage.setItem('theme', newTheme);
+    });
+}
+
+// Scroll reveal animation
+const infoBlocks = document.querySelectorAll('.info-block');
+const revealBlocks = () => {
+    infoBlocks.forEach(block => {
+        const blockTop = block.getBoundingClientRect().top;
+        const windowHeight = window.innerHeight;
+        if (blockTop < windowHeight * 0.8) {
+            block.style.opacity = 1;
+            block.style.transform = 'translateY(0)';
+        }
+    });
+};
+
+// Initial scroll reveal
+revealBlocks();
+
+// Debounced scroll reveal
+let isScrolling;
+window.addEventListener('scroll', () => {
+    window.cancelAnimationFrame(isScrolling);
+    isScrolling = window.requestAnimationFrame(revealBlocks);
+});
+
+// Initial load animation
+window.addEventListener('load', () => {
+    document.querySelector('.container').classList.add('loaded');
+});
+
+// Initialize all updates
+scheduleUpdates();
+
+// Cleanup event listeners and intervals on page unload
+window.addEventListener('unload', () => {
+    window.removeEventListener('scroll', revealBlocks);
+    themeToggle?.removeEventListener('click', themeToggle.click);
+});
+    </script>
+</body>
+</html>
