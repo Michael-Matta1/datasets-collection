@@ -1,0 +1,199 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    --primary-color: #22c55e;
+    --accent-color: #eab308;
+    --bg-gradient: linear-gradient(135deg, #0f172a, #1e293b);
+    --card-bg: rgba(255, 255, 255, 0.03);
+    --card-hover-bg: rgba(255, 255, 255, 0.06);
+    --text-primary: rgba(255, 255, 255, 0.95);
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --shadow-color: rgba(0, 0, 0, 0.4);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    background: var(--bg-gradient);
+    color: var(--text-primary);
+    width: 400px;
+    height: 600px;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+    padding: 40px 20px;
+    display: grid;
+    gap: 30px;
+}
+
+.info-block {
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 24px;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 6px var(--shadow-color);
+}
+
+.info-block::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.info-block:hover {
+    transform: translateY(-5px);
+    background: var(--card-hover-bg);
+    box-shadow: 0 12px 24px var(--shadow-color);
+}
+
+.info-block:hover::before {
+    transform: translateX(100%);
+}
+
+.label {
+    font-size: 0.875rem;
+    margin-bottom: 12px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+}
+
+.value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    transition: color 0.3s;
+    margin: 8px 0;
+    text-shadow: 0 0 25px rgba(34, 197, 94, 0.2);
+    line-height: 1.2;
+}
+
+.passed {
+    color: #ef4444;
+    animation: pulseGlow 2s infinite;
+}
+
+.week-type {
+    font-size: 1.25rem;
+    color: var(--accent-color);
+    margin-left: 16px;
+    font-weight: 600;
+    text-shadow: 0 0 15px rgba(234, 179, 8, 0.2);
+}
+
+.sub-value {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    margin-top: 10px;
+    font-weight: 500;
+}
+
+.timezone-indicator {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-top: 10px;
+    opacity: 0.8;
+    font-weight: 500;
+}
+
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+}
+
+.progress-container {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+    margin-top: 20px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--primary-color);
+    transition: width 0.5s ease-out;
+    position: relative;
+    border-radius: 3px;
+}
+
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, 
+        transparent,
+        rgba(255, 255, 255, 0.15),
+        transparent);
+    animation: progressShine 2s infinite;
+}
+
+@keyframes pulseGlow {
+    0% { 
+        opacity: 1;
+        text-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+    }
+    50% { 
+        opacity: 0.8;
+        text-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+    }
+    100% { 
+        opacity: 1;
+        text-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+    }
+}
+
+@keyframes progressShine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 20px;
+        gap: 20px;
+    }
+
+    .info-block {
+        padding: 24px;
+    }
+
+    .value {
+        font-size: 2rem;
+    }
+
+    .week-type {
+        font-size: 1rem;
+    }
+
+    .label {
+        font-size: 0.75rem;
+    }
+}
