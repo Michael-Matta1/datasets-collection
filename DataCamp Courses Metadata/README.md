@@ -49,9 +49,7 @@ Want to analyze your own DataCamp learning journey? You can:
 
 ### Data Quality
 > **Note:**  
-> The dataset has undergone a multi-step collection process, including **scraping, extraction, transformation, and merging**. While careful effort was made to ensure accuracy and consistency, there may still be some **minor errors or inconsistencies** due to the complexity of the process.  
->  
-> Additionally, some data is inherently **less precise as originally assigned by DataCamp** and was extracted in that form. For example, a course that primarily covers **PyTorch** may still have its technology listed more broadly as **Python**, which is the case I discovered for one course in my own completed courses.
+> The dataset has undergone a multi-step collection process, including **scraping, extraction, transformation, and merging**. While careful effort was made to ensure accuracy and consistency, there may still be some **minor inconsistencies** due to the complexity of the process: Some data is inherently **less precise as originally assigned by DataCamp** and was extracted in that form. For example, some courses may have a **programming language listed where it should not be**, such as theory courses, because the DataCamp API assigned it incorrectly. Similarly, a course that primarily covers **PyTorch** may still have its technology listed more broadly as **Python**, which I confirmed in one of my own completed courses. 
 
 ### Customization
 > **Note:**  
